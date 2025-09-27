@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Discusso: AI Meeting Buddy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --card-glow: radial-gradient(300px circle at var(--mouse-x) var(--mouse-y), rgba(0, 255, 255, 0.1), transparent 40%);
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      @keyframes gradient-xy {
+        0%, 100% {
+            background-size: 200% 200%;
+            background-position: 0% 50%;
+        }
+        50% {
+            background-size: 200% 200%;
+            background-position: 100% 50%;
+        }
+      }
+      .animate-gradient-xy {
+        animation: gradient-xy 15s ease infinite;
+      }
+
+      @keyframes slide-in {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .page-container {
+        animation: slide-in 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      }
+
+      @keyframes content-fade-in {
+        from { opacity: 0; transform: scale(0.98) translateY(10px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+      }
+      .animate-content-fade-in {
+        animation: content-fade-in 0.5s ease-out forwards;
+      }
+      
+      /* Staggered animation for child elements */
+      .stagger-children > * {
+        opacity: 0;
+        animation: slide-in 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      }
+
+      @keyframes rotating-border {
+        0% { --angle: 0deg; }
+        100% { --angle: 360deg; }
+      }
+
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.21.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-slate-900">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

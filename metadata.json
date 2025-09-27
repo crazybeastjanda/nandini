@@ -1,0 +1,7 @@
+{
+  "name": "Discusso: AI Meeting Buddy",
+  "description": "An AI-powered meeting assistant that automates scheduling, prepares agendas, and tracks follow-ups to make vendor-distributor meetings more productive. Features gamification to build trust and momentum.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
