@@ -1,5 +1,4 @@
 import React from 'react';
-import Header from '../components/Header';
 import FeatureCard from '../components/FeatureCard';
 import BadgesShowcase from '../components/BadgesShowcase';
 import { 
@@ -76,7 +75,6 @@ const HomePage: React.FC<HomePageProps> = ({ setCurrentPage, isMeetingReady, isM
 
   return (
     <div className="page-container">
-      <Header />
       <main className="mt-8 relative z-10">
         <div className="text-center mb-12 stagger-children">
             <h2 className="text-4xl font-black tracking-tighter text-slate-100 sm:text-5xl lg:text-6xl" style={{ animationDelay: '100ms' }}>Your All-in-One Meeting Assistant</h2>

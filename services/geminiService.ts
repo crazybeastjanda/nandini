@@ -1,12 +1,8 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import type { Meeting, SalesRecord, GeneratedFollowUp, Participant } from '../types';
 
-// This check is important, but we'll also add checks inside the functions for better UI feedback.
-if (!process.env.API_KEY) {
-    console.warn("API_KEY environment variable not set. AI features will fail.");
-}
-
+// FIX: Per coding guidelines, the API key must be obtained exclusively from `process.env.API_KEY` and used directly for initialization.
+// The previous method `import.meta.env.VITE_API_KEY` and related checks are removed to resolve the TypeScript error and align with guidelines.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 /**
@@ -16,32 +12,53 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
  * @returns A string containing the generated agenda.
  */
 export async function generateAgenda(pastMeetings: Meeting[], salesRecords: SalesRecord[]): Promise<string> {
-    if (!process.env.API_KEY) {
-        return "Error: API_KEY is not configured.\nPlease set the API_KEY environment variable to use AI features.";
+    // FIX: Removed manual API key check as per guidelines. The SDK will handle auth, and errors are caught below.
+    
+    let promptContext = '';
+
+    if (pastMeetings.length > 0) {
+        const latestMeeting = pastMeetings[0];
+        promptContext += `
+            Context from the last meeting on ${latestMeeting.date}:
+            Topic: ${latestMeeting.topic}
+            Outcome: ${latestMeeting.outcome}
+        `;
+    } else {
+        promptContext += `
+            This is the first meeting with this distributor.
+        `;
     }
 
-    const latestMeeting = pastMeetings[0];
-    const recentSales = salesRecords.slice(0, 3);
+    if (salesRecords.length > 0) {
+        const recentSales = salesRecords.slice(0, 3);
+        promptContext += `
+            Recent sales data context:
+            ${recentSales.map(r => `- ${r.product}: ${r.licenses} licenses sold to ${r.customerType} clients in ${r.month}.`).join('\n')}
+        `;
+    }
 
     const prompt = `
         You are an AI meeting assistant for a vendor-distributor relationship.
         Your task is to generate a concise, actionable agenda for the upcoming meeting.
 
-        Context from the last meeting on ${latestMeeting.date}:
-        Topic: ${latestMeeting.topic}
-        Outcome: ${latestMeeting.outcome}
+        ${promptContext}
 
-        Recent sales data context:
-        ${recentSales.map(r => `- ${r.product}: ${r.licenses} licenses sold to ${r.customerType} clients in ${r.month}.`).join('\n')}
-
-        Based on this context, create a 3-point agenda for the next meeting. 
+        Based on this context, create a 3-point agenda for the next meeting.
+        If this is the first meeting, the agenda should focus on introductions, understanding their business, and outlining partnership goals.
+        Otherwise, base the agenda on the previous meeting's outcome and recent sales.
+        
         For each point, add a brief description of the goal.
         Format the output as a clean, readable text. Do not use Markdown formatting like # or **.
         
-        Example format:
+        Example format for an existing relationship:
         1. Review of Previous Action Items: Briefly touch on the outcomes from our last discussion on [Previous Topic].
         2. Q3 Sales Performance Analysis: Discuss the recent sales figures, focusing on [Key Product] and opportunities for growth.
         3. 'QuantumLeap' Product Launch Strategy: Finalize the marketing and distribution plan for the new product launch in the DACH region.
+
+        Example format for a first meeting:
+        1. Introductions and Company Overviews: Share background on both our companies and key team members.
+        2. Understanding Your Business Goals: Discuss your current market, challenges, and what you look for in a vendor partner.
+        3. Outlining a Potential Partnership: Explore how our products can help you achieve your goals and discuss next steps.
     `;
 
     try {
@@ -52,8 +69,8 @@ export async function generateAgenda(pastMeetings: Meeting[], salesRecords: Sale
         return response.text;
     } catch (error) {
         console.error("Error generating agenda:", error);
-        // Provide a more user-friendly error that can be displayed in the UI
-        return `Error: Could not generate agenda.\nThis might be due to an invalid API key or network issues. Please check your configuration and try again.`;
+        // FIX: Updated error message to be more generic and not mention API key issues, as per guidelines.
+        return `Error: Could not generate agenda.\nThis might be due to a network issue or an API error. Please try again later.`;
     }
 }
 
@@ -63,11 +80,7 @@ export async function generateAgenda(pastMeetings: Meeting[], salesRecords: Sale
  * @returns An array of generated follow-up objects.
  */
 export async function generateFollowUps(meetingSummary: string): Promise<GeneratedFollowUp[]> {
-     if (!process.env.API_KEY) {
-        console.error("API_KEY is not configured.");
-        // Return an empty array or a mock error response
-        return [];
-    }
+    // FIX: Removed manual API key check as per guidelines.
     const prompt = `
         Based on the following meeting summary, identify and create a list of 2-3 clear, actionable follow-up tasks.
         Assign a priority ('High', 'Medium', 'Low') and a suggested due date for each task (relative to today, which is ${new Date().toLocaleDateString('en-CA')}).
@@ -129,13 +142,7 @@ export async function generateTranscriptAndSummary(agenda: string, notes: string
 [17:00] You: Okay, I think that covers everything. We have our action items. Thanks for a productive meeting.
     `.trim();
 
-    if (!process.env.API_KEY) {
-        return {
-            transcript: mockTranscript,
-            summary: "Error: API_KEY is not configured. Cannot generate AI summary.",
-        };
-    }
-
+    // FIX: Removed manual API key check as per guidelines.
     const prompt = `
         You are an AI meeting assistant. Your task is to generate a concise, professional summary of a meeting.
         Use the provided meeting agenda and the raw notes taken during the call to create the summary.
@@ -167,7 +174,8 @@ export async function generateTranscriptAndSummary(agenda: string, notes: string
         console.error("Error generating summary:", error);
         return {
             transcript: mockTranscript,
-            summary: `Error: Could not generate summary.\nThis might be due to an invalid API key or network issues.`,
+            // FIX: Updated error message to be more generic and not mention API key issues, as per guidelines.
+            summary: `Error: Could not generate summary.\nThis might be due to a network issue or an API error.`,
         };
     }
 }
@@ -179,10 +187,7 @@ export async function generateTranscriptAndSummary(agenda: string, notes: string
  * @returns A string containing the AI-generated summary.
  */
 export async function generateRelationshipSummary(participant: Participant, meetings: Meeting[]): Promise<string> {
-    if (!process.env.API_KEY) {
-        return "Error: API_KEY is not configured.\nPlease set the API_KEY environment variable to use AI features.";
-    }
-
+    // FIX: Removed manual API key check as per guidelines.
     const meetingHistory = meetings.map(m => `- On ${m.date}, discussed "${m.topic}" with the outcome: "${m.outcome}"`).join('\n');
 
     const prompt = `
@@ -209,6 +214,7 @@ export async function generateRelationshipSummary(participant: Participant, meet
         return response.text;
     } catch (error) {
         console.error("Error generating relationship summary:", error);
-        return `Error: Could not generate summary.\nThis might be due to an invalid API key or network issues.`;
+        // FIX: Updated error message to be more generic and not mention API key issues, as per guidelines.
+        return `Error: Could not generate summary.\nThis might be due to a network issue or an API error.`;
     }
 }

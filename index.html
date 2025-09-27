@@ -62,6 +62,49 @@
         0% { --angle: 0deg; }
         100% { --angle: 360deg; }
       }
+      
+      /* Toast animation */
+      @keyframes toast-in {
+        from {
+          opacity: 0;
+          transform: translateY(-20px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      @keyframes toast-out {
+        from {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+        to {
+          opacity: 0;
+          transform: translateY(-20px) scale(0.95);
+        }
+      }
+      .animate-toast-in {
+        animation: toast-in 0.3s ease-out forwards;
+      }
+      .animate-toast-out {
+        animation: toast-out 0.3s ease-in forwards;
+      }
+
+      /* Dropdown animation */
+      @keyframes dropdown-in {
+          from {
+              opacity: 0;
+              transform: scale(0.95) translateY(-10px);
+          }
+          to {
+              opacity: 1;
+              transform: scale(1) translateY(0);
+          }
+      }
+      .animate-dropdown-in {
+          animation: dropdown-in 0.2s ease-out forwards;
+      }
 
     </style>
   <script type="importmap">
